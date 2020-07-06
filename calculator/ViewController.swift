@@ -14,9 +14,10 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     @IBOutlet weak var resultLabel: UILabel!
     @IBOutlet weak var equalButton: UIButton!
 
-    var inValue = 0 //入力値
-    var outValue = 0 //計算後の値
+    var inValue = 0.0 //入力値
+    var outValue = 0.0 //計算後の値
     var isDesiminal = false //小数フラグ
+    var decimalDigit = 0
     var oPerator = 0 //0 なし 1 + 2 - 3 * 4 /
 
     private let button = ["7","8","9","minus","4","5","6","plus","1","2","3","multiply","0","dot","ac","devide"]
@@ -57,9 +58,18 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
 
         if Int(button[indexPath.row]) != nil {
             //数字入力の場合
-            inValue = Int(button[indexPath.row])! + inValue*10
-            resultLabel.text = inValue.description
 
+            if !isDesiminal {
+                //整数部入力
+                inValue = Double(button[indexPath.row])! + inValue*10
+                resultLabel.text = inValue.description
+
+            } else {
+                //小数部入力
+                decimalDigit += 1
+                inValue = inValue + (Double(button[indexPath.row])! * pow(0.1,Double(decimalDigit)))
+                resultLabel.text = inValue.description
+            }
         } else {
             //数字以外の場合
 
@@ -67,6 +77,8 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
                 if inValue == 0 {
                     outValue = 0
                 }
+                isDesiminal = false
+                decimalDigit = 0
                 inValue = 0
                 oPerator = 0
                 resultLabel.text = outValue.description
@@ -95,13 +107,16 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
             }
         }
 
+//        if inValue.description.count > 16 || outValue.description.count > 16 {
+//            resultLabel.text = "error: limit over"
+//            return
+//        }
     }
 
     func calc(){
         if oPerator == 0 {
             outValue = inValue
             inValue = 0
-            return
         }
         if oPerator == 1 {
             outValue += inValue
@@ -115,11 +130,13 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
         if oPerator == 4 {
             if inValue != 0 {
                 outValue /= inValue
-            }else {
-                resultLabel.text = "error"
+            } else {
+                resultLabel.text = "error: devide by 0"
                 return
             }
         }
+        isDesiminal = false
+        decimalDigit = 0
         inValue = 0
         resultLabel.text = outValue.description
     }
