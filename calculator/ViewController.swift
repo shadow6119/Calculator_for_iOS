@@ -14,10 +14,10 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     @IBOutlet weak var resultLabel: UILabel!
     @IBOutlet weak var equalButton: UIButton!
 
-    var inValue = 0.0 //入力値
+    var integerPart = 0 //整数値
+    var decimalPart = 0 //小数部
     var outValue = 0.0 //計算後の値
     var isDesiminal = false //小数フラグ
-    var decimalDigit = 0
     var oPerator = 0 //0 なし 1 + 2 - 3 * 4 /
 
     private let button = ["7","8","9","minus","4","5","6","plus","1","2","3","multiply","0","dot","ac","devide"]
@@ -25,7 +25,7 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        resultLabel.text = inValue.description
+        resultLabel.text = integerPart.description
 //        collectionView.isScrollEnabled = false
     }
 
@@ -61,27 +61,26 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
 
             if !isDesiminal {
                 //整数部入力
-                inValue = Double(button[indexPath.row])! + inValue*10
-                resultLabel.text = inValue.description
+                integerPart = Int(button[indexPath.row])! + integerPart * 10
+                resultLabel.text = integerPart.description
 
             } else {
                 //小数部入力
-                decimalDigit += 1
-                inValue = inValue + (Double(button[indexPath.row])! * pow(0.1,Double(decimalDigit)))
-                resultLabel.text = inValue.description
+                decimalPart = Int(button[indexPath.row])! + decimalPart*10
+                resultLabel.text = integerPart.description + "." + decimalPart.description
             }
         } else {
             //数字以外の場合
 
             if button[indexPath.row] == "ac" {
-                if inValue == 0 {
+                if integerPart == 0 && decimalPart == 0 {
                     outValue = 0
+                    oPerator = 0
                 }
                 isDesiminal = false
-                decimalDigit = 0
-                inValue = 0
-                oPerator = 0
-                resultLabel.text = outValue.description
+                decimalPart = 0
+                integerPart = 0
+                resultLabel.text = "0"
             }
 
             if button[indexPath.row] == "dot" {
@@ -107,16 +106,26 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
             }
         }
 
-//        if inValue.description.count > 16 || outValue.description.count > 16 {
+//        if integerPart.description.count > 16 || outValue.description.count > 16 {
 //            resultLabel.text = "error: limit over"
 //            return
 //        }
     }
 
     func calc(){
+
+        let inValue :Double
+
+        if(decimalPart != 0){
+            let strValue = (integerPart.description + "." + decimalPart.description)
+            inValue = Double(strValue)!
+        }else{
+            inValue = Double(integerPart)
+        }
+
         if oPerator == 0 {
             outValue = inValue
-            inValue = 0
+            integerPart = 0
         }
         if oPerator == 1 {
             outValue += inValue
@@ -128,7 +137,7 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
             outValue *= inValue
         }
         if oPerator == 4 {
-            if inValue != 0 {
+            if integerPart != 0 {
                 outValue /= inValue
             } else {
                 resultLabel.text = "error: devide by 0"
@@ -136,8 +145,8 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
             }
         }
         isDesiminal = false
-        decimalDigit = 0
-        inValue = 0
+        decimalPart = 0
+        integerPart = 0
         resultLabel.text = outValue.description
     }
 
