@@ -137,7 +137,7 @@ class ViewController: UIViewController, UICollectionViewDataSource, UICollection
             outValue *= inValue
         }
         if oPerator == 4 {
-            if integerPart != 0 {
+            if inValue != 0 {
                 outValue /= inValue
             } else {
                 resultLabel.text = "error: devide by 0"
